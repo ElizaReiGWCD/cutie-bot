@@ -16,6 +16,11 @@ namespace discordbot
 
         static async Task MainAsync(string[] args)
         {
+            MessageRepository repository = new MessageRepository();
+            repository.Initialize();
+
+            
+
             var discord = new DiscordClient(new DiscordConfiguration
             {
                 Token = (string)Environment.GetEnvironmentVariables()["DISCORD_TOKEN"],
@@ -24,6 +29,10 @@ namespace discordbot
                 LogLevel = LogLevel.Debug
             });
 
+            discord.MessageCreated += async evt => {
+                await repository.StoreMessage(evt.Message);
+            };
+
             var commands = discord.UseCommandsNext(new CommandsNextConfiguration
             {
                 StringPrefix = ";;"
@@ -31,7 +40,11 @@ namespace discordbot
 
             commands.RegisterCommands<CutieCommands>();
 
+            MessageSnsListener snsListener = new MessageSnsListener(discord);
+            await snsListener.Initialize();
+
             await discord.ConnectAsync();
+
             await Task.Delay(-1); //wait so the program doesn't quit immediately
         }
     }
