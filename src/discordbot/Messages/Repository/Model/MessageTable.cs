@@ -1,7 +1,7 @@
 using System;
 using Amazon.DynamoDBv2.DataModel;
 
-namespace discordbot
+namespace discordbot.Messages.Repository.Model
 {
     [DynamoDBTable("MessageCleanupTable")]
     public class CleanupMessage

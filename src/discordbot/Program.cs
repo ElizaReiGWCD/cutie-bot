@@ -4,48 +4,74 @@ using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using System.Linq;
 using System.Collections;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using AWS.Logger.AspNetCore;
+using AWS.Logger;
+using Amazon.SQS;
+using Amazon;
+using Amazon.DynamoDBv2;
+using Amazon.CloudWatch;
+using discordbot.Metrics;
+using discordbot.Messages.Repository;
+using discordbot.Messages.Processors;
+using discordbot.Messages.Dispatcher;
 
 namespace discordbot
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
-            MainAsync(args).ConfigureAwait(false).GetAwaiter().GetResult();
-        }
+            RegionEndpoint awsRegion = RegionEndpoint.EUWest1;
 
-        static async Task MainAsync(string[] args)
-        {
-            MessageRepository repository = new MessageRepository();
-            repository.Initialize();
-
-            
-
-            var discord = new DiscordClient(new DiscordConfiguration
+            AWSLoggerConfig loggerConfig = new AWSLoggerConfig()
             {
-                Token = (string)Environment.GetEnvironmentVariables()["DISCORD_TOKEN"],
-                TokenType = TokenType.Bot,
-                UseInternalLogHandler = true,
-                LogLevel = LogLevel.Debug
-            });
-
-            discord.MessageCreated += async evt => {
-                await repository.StoreMessage(evt.Message);
+                Region = awsRegion.SystemName,
+                LogGroup = "CutieBotLogs"
             };
 
-            var commands = discord.UseCommandsNext(new CommandsNextConfiguration
+            var host = new HostBuilder()
+                .ConfigureServices((context, services) =>
+                {
+                    services.AddLogging();
+
+                    // Add infrastructure and clients
+                    services.AddSingleton<AmazonCloudWatchClient>(new AmazonCloudWatchClient(awsRegion));
+                    services.AddSingleton<AmazonSQSClient>(new AmazonSQSClient(awsRegion));
+                    services.AddSingleton<AmazonDynamoDBClient>(new AmazonDynamoDBClient(awsRegion));
+                    services.AddSingleton<CloudWatchMetrics>();
+                    services.AddSingleton<MessageRepository>();
+                    services.AddSingleton<DiscordClient>(new DiscordClient(new DiscordConfiguration
+                    {
+                        Token = (string)Environment.GetEnvironmentVariables()["DISCORD_TOKEN"],
+                        TokenType = TokenType.Bot,
+                        LogLevel = DSharpPlus.LogLevel.Debug
+                    }));
+
+                    // Add message processors
+                    services.AddSingleton<IMessageProcessor, GalleryMessageProcessor>();
+                    services.AddSingleton<IMessageProcessor, ImageMessageProcessor>();
+                    services.AddSingleton<MessageDispatcher>();
+
+                    // Add services
+                    services.AddHostedService<DiscordClientService>();
+                    services.AddHostedService<SqsListenerService>();
+                })
+                .ConfigureLogging((context, logger) =>
+                {
+                    logger.AddProvider(new AWSLoggerProvider(loggerConfig));
+                    logger.AddConsole();
+                })
+                .Build();
+
+            using (host)
             {
-                StringPrefix = ";;"
-            });
+                await host.StartAsync();
 
-            commands.RegisterCommands<CutieCommands>();
-
-            MessageSnsListener snsListener = new MessageSnsListener(discord);
-            await snsListener.Initialize();
-
-            await discord.ConnectAsync();
-
-            await Task.Delay(-1); //wait so the program doesn't quit immediately
+                await host.WaitForShutdownAsync();
+            }
         }
     }
 }
