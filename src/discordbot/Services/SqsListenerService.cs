@@ -109,6 +109,10 @@ namespace discordbot
                         {
                             logger.LogWarning($"Tried to delete message {messageId} but it was not found and probably already deleted");
                         }
+                        catch(UnauthorizedException ex)
+                        {
+                            logger.LogError($"Could not delete message {messageId} in channel {channelId} because of lacking permissions");
+                        }
                     }
 
                     await DeleteMessage(message);

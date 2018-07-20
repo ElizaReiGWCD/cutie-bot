@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Amazon.CloudWatch;
 using Amazon.CloudWatch.Model;
@@ -11,26 +12,36 @@ namespace discordbot.Metrics
         private readonly AmazonCloudWatchClient cloudWatchClient;
         private readonly ILogger<CloudWatchMetrics> logger;
 
+        private readonly List<MetricDatum> MetricData;
+
         public CloudWatchMetrics(AmazonCloudWatchClient cloudWatchClient, ILogger<CloudWatchMetrics> logger)
         {
             this.cloudWatchClient = cloudWatchClient;
             this.logger = logger;
+
+            MetricData = new List<MetricDatum>();
         }
 
         public async Task AddCounter(string metricName, double count)
         {
-            var metricData = new PutMetricDataRequest();
-
             var metricDatum = new MetricDatum();
             metricDatum.MetricName = metricName;
             metricDatum.Value = count;
             metricDatum.Timestamp = DateTime.UtcNow;
             metricDatum.Unit = StandardUnit.Count;
+            MetricData.Add(metricDatum);
             
-            metricData.MetricData.Add(metricDatum);
-            metricData.Namespace = "CutieBot";
+            if(MetricData.Count > 10)
+            {
+                var metricData = new PutMetricDataRequest();
+                metricData.MetricData = MetricData;
+                metricData.Namespace = "CutieBot";
 
-            await cloudWatchClient.PutMetricDataAsync(metricData);
+                await cloudWatchClient.PutMetricDataAsync(metricData);
+                
+                MetricData.Clear();
+            }
+            
         }
     }
 }

@@ -43,6 +43,7 @@ namespace discordbot
                     services.AddSingleton<AmazonDynamoDBClient>(new AmazonDynamoDBClient(awsRegion));
                     services.AddSingleton<CloudWatchMetrics>();
                     services.AddSingleton<MessageRepository>();
+                    services.AddSingleton<MemberRepository>();
                     services.AddSingleton<DiscordClient>(new DiscordClient(new DiscordConfiguration
                     {
                         Token = (string)Environment.GetEnvironmentVariables()["DISCORD_TOKEN"],
@@ -53,6 +54,8 @@ namespace discordbot
                     // Add message processors
                     services.AddSingleton<IMessageProcessor, GalleryMessageProcessor>();
                     services.AddSingleton<IMessageProcessor, ImageMessageProcessor>();
+                    services.AddSingleton<IMessageProcessor, MessageCountProcessor>();
+                    services.AddSingleton<IMessageProcessor, MessageCountInfoProcessor>();
                     services.AddSingleton<MessageDispatcher>();
 
                     // Add services

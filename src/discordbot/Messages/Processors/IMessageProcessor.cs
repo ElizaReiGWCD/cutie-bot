@@ -11,5 +11,7 @@ namespace discordbot.Messages.Processors
         Task ProcessMessage(DiscordMessage discordMessage);
 
         bool ShouldProcess(DiscordMessage discordMessage);
+
+        bool ShouldBreak(DiscordMessage discordMessage);
     }
 }

@@ -27,15 +27,17 @@ namespace discordbot.Messages.Dispatcher
 
         public async Task Dispatch(DiscordMessage discordMessage)
         {
-            var processor = processors.FirstOrDefault(p => p.ShouldProcess(discordMessage));
+            foreach(var processor in processors)
+            {
+                if(processor.ShouldProcess(discordMessage))
+                {
+                    await processor.ProcessMessage(discordMessage);
 
-            if(processor != null)
-            {
-                await processor.ProcessMessage(discordMessage);
-            }
-            else
-            {
-                logger.LogDebug($"No handler for message with id {discordMessage.Id}");
+                    if(processor.ShouldBreak(discordMessage))
+                    {
+                        break;
+                    }
+                }
             }
         }
     }

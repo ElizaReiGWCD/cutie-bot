@@ -11,16 +11,23 @@ namespace discordbot.Messages.Processors
     public class GalleryMessageProcessor : AbstractDiscordMessageProcessor
     {
 
-        public GalleryMessageProcessor(DiscordClient discordClient, CloudWatchMetrics metrics, ILogger<AbstractDiscordMessageProcessor> logger) : base(discordClient, metrics, logger)
+        public GalleryMessageProcessor(DiscordClient discordClient, CloudWatchMetrics metrics, ILogger<GalleryMessageProcessor> logger) : base(discordClient, metrics, logger)
         {}
 
         public override string ProcessorName => "GalleryMessageProcessor";
 
-        public override int Priority => 10;
+        public override int Priority => 99;
+
+        public override bool ShouldBreak(DiscordMessage discordMessage)
+        {
+            return true;
+        }
 
         public override bool ShouldProcess(DiscordMessage discordMessage)
         {
-            return !string.IsNullOrEmpty(discordMessage.Content) && discordMessage.Content.StartsWith(";;post");
+            return !string.IsNullOrEmpty(discordMessage.Content)
+                   && discordMessage.Content.StartsWith(";;post")
+                   && IsPerv(discordMessage);
         }
 
         protected override async Task<bool> HandleMessage(DiscordMessage discordMessage)

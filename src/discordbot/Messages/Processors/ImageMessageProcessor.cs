@@ -16,14 +16,14 @@ namespace discordbot.Messages.Processors
 
         private Regex dtlRegex { get; } = new Regex(@" \(-?\d\)$");
 
-        public ImageMessageProcessor(DiscordClient discordClient, CloudWatchMetrics metrics, MessageRepository messageRepository, ILogger<AbstractDiscordMessageProcessor> logger) : base(discordClient, metrics, logger)
+        public ImageMessageProcessor(DiscordClient discordClient, CloudWatchMetrics metrics, MessageRepository messageRepository, ILogger<ImageMessageProcessor> logger) : base(discordClient, metrics, logger)
         {
             this.messageRepository = messageRepository;
         }
 
         public override string ProcessorName => "ImageMessageProcessor";
 
-        public override int Priority => 99;
+        public override int Priority => 10;
 
         public override bool ShouldProcess(DiscordMessage discordMessage)
         {
@@ -75,6 +75,11 @@ namespace discordbot.Messages.Processors
             {
                 return 30;
             }
+        }
+
+        public override bool ShouldBreak(DiscordMessage discordMessage)
+        {
+            return false;
         }
     }
 }
