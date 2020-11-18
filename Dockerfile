@@ -1,6 +1,6 @@
-FROM mcr.microsoft.com/dotnet/core/aspnet:2.1
+FROM mcr.microsoft.com/dotnet/core/aspnet:5.0
 
-COPY src/discordbot/bin/Release/netcoreapp2.1/publish/ App/
+COPY src/discordbot/bin/Release/net5.0/publish/ App/
 
 WORKDIR /App
 
