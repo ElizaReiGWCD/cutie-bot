@@ -1,12 +1,7 @@
-FROM microsoft/dotnet
+FROM mcr.microsoft.com/dotnet/core/aspnet:2.1
 
-WORKDIR /app
+COPY src/discordbot/bin/Release/netcoreapp2.1/publish/ App/
 
-# Copy csproj and restore as distinct layers
-COPY *.csproj ./
-RUN dotnet restore
+WORKDIR /App
 
-COPY . ./
-RUN dotnet build
-
-ENTRYPOINT [ "dotnet", "run" ]
+ENTRYPOINT [ "dotnet", "discordbot.dll" ]
