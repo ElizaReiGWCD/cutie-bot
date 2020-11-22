@@ -13,6 +13,7 @@ using Amazon.SQS;
 using Amazon;
 using Amazon.DynamoDBv2;
 using Amazon.CloudWatch;
+using Amazon.Comprehend;
 using discordbot.Metrics;
 using discordbot.Messages.Repository;
 using discordbot.Messages.Processors;
@@ -41,6 +42,7 @@ namespace discordbot
                     services.AddSingleton<AmazonCloudWatchClient>(new AmazonCloudWatchClient(awsRegion));
                     services.AddSingleton<AmazonSQSClient>(new AmazonSQSClient(awsRegion));
                     services.AddSingleton<AmazonDynamoDBClient>(new AmazonDynamoDBClient(awsRegion));
+                    services.AddSingleton<AmazonComprehendClient>(new AmazonComprehendClient(awsRegion));
                     services.AddSingleton<CloudWatchMetrics>();
                     services.AddSingleton<MessageRepository>();
                     services.AddSingleton<MemberRepository>();
@@ -56,6 +58,8 @@ namespace discordbot
                     services.AddSingleton<IMessageProcessor, ImageMessageProcessor>();
                     services.AddSingleton<IMessageProcessor, MessageCountProcessor>();
                     services.AddSingleton<IMessageProcessor, MessageCountInfoProcessor>();
+                    services.AddSingleton<IMessageProcessor, SentimentMessageProcessor>();
+                    services.AddSingleton<IMessageProcessor, ShowSentimentMessageProcessor>();
                     services.AddSingleton<MessageDispatcher>();
 
                     // Add services

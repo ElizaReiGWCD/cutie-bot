@@ -27,7 +27,7 @@ namespace discordbot.Metrics
             var metricDatum = new MetricDatum();
             metricDatum.MetricName = metricName;
             metricDatum.Value = count;
-            metricDatum.Timestamp = DateTime.UtcNow;
+            metricDatum.TimestampUtc = DateTime.UtcNow;
             metricDatum.Unit = StandardUnit.Count;
             MetricData.Add(metricDatum);
             
