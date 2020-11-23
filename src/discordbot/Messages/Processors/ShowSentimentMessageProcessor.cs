@@ -40,29 +40,23 @@ class ShowSentimentMessageProcessor : AbstractDiscordMessageProcessor
         GetMetricWidgetImageRequest request = new GetMetricWidgetImageRequest();
         request.OutputFormat = "png";
         request.MetricWidget = @"
-        {
-            ""view"": ""pie"",
-            ""stacked"": false,
-            ""metrics"": [
-                [ ""CutieBot"", ""Discord.SentimentScore.Mixed"", { ""label"": ""[avg: ${AVG}] Discord.SentimentScore.Mixed"", ""color"": ""#ff7f0e"" } ],
-                [ ""."", ""Discord.SentimentScore.Negative"", { ""label"": ""[avg: ${AVG}] Discord.SentimentScore.Negative"", ""color"": ""#d62728"" } ],
-                [ ""."", ""Discord.SentimentScore.Neutral"", { ""label"": ""[avg: ${AVG}] Discord.SentimentScore.Neutral"", ""color"": ""#bcbd22"" } ],
-                [ ""."", ""Discord.SentimentScore.Positive"", { ""label"": ""[avg: ${AVG}] Discord.SentimentScore.Positive"", ""color"": ""#2ca02c"" } ]
-            ],
-            ""setPeriodToTimeRange"": true,
-            ""stat"": ""Average"",
-            ""period"": 300,
-            ""labels"": {
-                ""visible"": false
-            },
-            ""legend"": {
-                ""position"": ""bottom""
-            },
-            ""width"": 600,
-            ""height"": 600,
-            ""start"": ""-P1D"",
-            ""end"": ""P0D""
-        }
+            {
+                ""metrics"": [
+                    [ ""CutieBot"", ""Discord.SentimentScore.Positive"", { ""label"": ""[avg: ${AVG}] Discord.SentimentScore.Positive"", ""color"": ""#2ca02c"" } ],
+                    [ ""."", ""Discord.SentimentScore.Neutral"", { ""label"": ""[avg: ${AVG}] Discord.SentimentScore.Neutral"", ""color"": ""#f4f116"" } ],
+                    [ ""."", ""Discord.SentimentScore.Negative"", { ""label"": ""[avg: ${AVG}] Discord.SentimentScore.Negative"", ""color"": ""#d62728"" } ],
+                    [ ""."", ""Discord.SentimentScore.Mixed"", { ""label"": ""[avg: ${AVG}] Discord.SentimentScore.Mixed"", ""color"": ""#1f77b4"" } ]
+                ],
+                ""view"": ""pie"",
+                ""stacked"": false,
+                ""stat"": ""Average"",
+                ""period"": 300,
+                ""setPeriodToTimeRange"": true,
+                ""width"": 500,
+                ""height"": 500,
+                ""start"": ""-P1D"",
+                ""end"": ""P0D""
+            }
         ";
         GetMetricWidgetImageResponse getMetricWidgetImageResponse = await CloudWatchClient.GetMetricWidgetImageAsync(request);
 
