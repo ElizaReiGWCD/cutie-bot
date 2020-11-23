@@ -1,6 +1,6 @@
 [
     {
-      "name": "cutie-bot",
+      "name": "discord",
       "imageUri": "923950637486.dkr.ecr.eu-west-1.amazonaws.com/discordbot:latest"
     }
   ]
